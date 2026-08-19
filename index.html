@@ -1,247 +1,866 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pi Wallet Scanner</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Pi Wallet Scanner</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
 
-    body {
-      min-height: 100vh;
-      background: #f5f3ff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
+body{
+  font-family:Arial,sans-serif;
+  background:#f5f3ff;
+  color:#222;
+  min-height:100vh;
+  padding:20px;
+}
 
-    .container {
-      width: 100%;
-      max-width: 520px;
-      background: white;
-      border-radius: 22px;
-      padding: 30px;
-      box-shadow: 0 10px 35px rgba(0,0,0,0.12);
-    }
+.app{
+  max-width:700px;
+  margin:auto;
+}
 
-    .logo {
-      width: 70px;
-      height: 70px;
-      margin: 0 auto 15px;
-      border-radius: 50%;
-      background: #6f42c1;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 32px;
-      font-weight: bold;
-    }
+.header{
+  text-align:center;
+  padding:25px 10px;
+}
 
-    h1 {
-      text-align: center;
-      color: #222;
-      margin-bottom: 8px;
-    }
+.logo{
+  width:70px;
+  height:70px;
+  margin:auto;
+  border-radius:50%;
+  background:#6f42c1;
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:36px;
+  font-weight:bold;
+  box-shadow:0 8px 20px rgba(0,0,0,.15);
+}
 
-    .subtitle {
-      text-align: center;
-      color: #777;
-      margin-bottom: 28px;
-    }
+h1{
+  margin-top:15px;
+  font-size:28px;
+}
 
-    label {
-      display: block;
-      font-weight: bold;
-      margin-bottom: 8px;
-      color: #333;
-    }
+.subtitle{
+  color:#777;
+  margin-top:7px;
+}
 
-    input {
-      width: 100%;
-      padding: 15px;
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      font-size: 15px;
-      outline: none;
-      margin-bottom: 14px;
-    }
+.card{
+  background:white;
+  border-radius:20px;
+  padding:22px;
+  margin-bottom:18px;
+  box-shadow:0 7px 25px rgba(0,0,0,.08);
+}
 
-    input:focus {
-      border-color: #6f42c1;
-    }
+label{
+  display:block;
+  font-weight:bold;
+  margin-bottom:8px;
+}
 
-    button {
-      width: 100%;
-      padding: 15px;
-      border: none;
-      border-radius: 12px;
-      background: #6f42c1;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+input{
+  width:100%;
+  padding:15px;
+  border:1px solid #ddd;
+  border-radius:12px;
+  font-size:15px;
+  outline:none;
+}
 
-    button:hover {
-      background: #5b32a3;
-    }
+input:focus{
+  border-color:#6f42c1;
+}
 
-    .result {
-      display: none;
-      margin-top: 25px;
-      padding: 20px;
-      background: #f7f7f7;
-      border-radius: 15px;
-    }
+button{
+  width:100%;
+  margin-top:12px;
+  padding:15px;
+  border:0;
+  border-radius:12px;
+  background:#6f42c1;
+  color:white;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+}
 
-    .result h2 {
-      margin-bottom: 15px;
-      color: #222;
-    }
+button:hover{
+  opacity:.9;
+}
 
-    .item {
-      margin-bottom: 14px;
-    }
+button.secondary{
+  background:#eee;
+  color:#333;
+}
 
-    .item strong {
-      display: block;
-      color: #666;
-      font-size: 13px;
-      margin-bottom: 4px;
-    }
+.hidden{
+  display:none;
+}
 
-    .address {
-      word-break: break-all;
-      color: #6f42c1;
-    }
+.status{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:16px;
+  border-radius:14px;
+  margin-top:15px;
+  background:#f1f1f1;
+}
 
-    .warning {
-      margin-top: 20px;
-      padding: 12px;
-      border-radius: 10px;
-      background: #fff4d6;
-      color: #705500;
-      font-size: 13px;
-      line-height: 1.5;
-    }
+.dot{
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  background:#999;
+}
 
-    .footer {
-      text-align: center;
-      margin-top: 22px;
-      color: #999;
-      font-size: 12px;
-    }
-  </style>
+.dot.good{background:#22a447}
+.dot.warn{background:#e49b00}
+.dot.bad{background:#d93025}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:15px;
+}
+
+.stat{
+  background:#f7f7f7;
+  padding:16px;
+  border-radius:14px;
+}
+
+.stat small{
+  color:#777;
+  display:block;
+  margin-bottom:6px;
+}
+
+.stat strong{
+  font-size:18px;
+  word-break:break-word;
+}
+
+.address{
+  word-break:break-all;
+  color:#6f42c1;
+  font-size:13px;
+}
+
+.notice{
+  background:#fff5d7;
+  color:#705500;
+  padding:14px;
+  border-radius:12px;
+  line-height:1.5;
+  font-size:13px;
+  margin-top:15px;
+}
+
+.transaction{
+  border-bottom:1px solid #eee;
+  padding:15px 0;
+}
+
+.transaction:last-child{
+  border-bottom:0;
+}
+
+.tx-row{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:7px;
+}
+
+.incoming{
+  color:#16863a;
+}
+
+.outgoing{
+  color:#c52b2b;
+}
+
+.muted{
+  color:#777;
+  font-size:12px;
+}
+
+.loading{
+  text-align:center;
+  padding:20px;
+  color:#777;
+}
+
+.footer{
+  text-align:center;
+  color:#999;
+  font-size:12px;
+  padding:20px;
+}
+
+@media(max-width:500px){
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  h1{
+    font-size:24px;
+  }
+}
+</style>
 </head>
 
 <body>
 
-  <div class="container">
+<div class="app">
 
+  <div class="header">
     <div class="logo">π</div>
-
     <h1>Pi Wallet Scanner</h1>
-
     <p class="subtitle">
-      Check a Pi public wallet address
+      Public wallet activity & security analysis
     </p>
+  </div>
 
-    <label for="wallet">Pi Wallet Address</label>
+  <div class="card">
+
+    <label for="wallet">Pi Public Wallet Address</label>
 
     <input
       id="wallet"
       type="text"
-      placeholder="Paste your public wallet address"
+      placeholder="Paste public wallet address"
       autocomplete="off"
     >
 
     <button onclick="scanWallet()">
-      Scan Wallet
+      🔎 Scan Wallet
     </button>
 
-    <div class="result" id="result">
-
-      <h2>Wallet Information</h2>
-
-      <div class="item">
-        <strong>Status</strong>
-        <span id="status">Valid format</span>
-      </div>
-
-      <div class="item">
-        <strong>Wallet Address</strong>
-        <span class="address" id="address"></span>
-      </div>
-
-      <div class="item">
-        <strong>Network</strong>
-        <span>Pi Network</span>
-      </div>
-
-      <div class="item">
-        <strong>Wallet Type</strong>
-        <span>Public Address</span>
-      </div>
-
-    </div>
-
-    <div class="warning">
-      ⚠️ Never enter your Pi wallet passphrase or private key.
-      This scanner only accepts a public wallet address.
-    </div>
-
-    <div class="footer">
-      Pi Wallet Scanner © 2026
+    <div class="notice">
+      🔒 Never enter your Pi wallet passphrase, seed phrase or private key.
+      This scanner only works with publicly visible wallet information.
     </div>
 
   </div>
 
+
+  <div id="results" class="hidden">
+
+    <div class="card">
+
+      <h2>Security Assessment</h2>
+
+      <div id="securityStatus" class="status">
+        <div id="securityDot" class="dot"></div>
+
+        <div>
+          <strong id="securityTitle">
+            Waiting for scan
+          </strong>
+
+          <div id="securityText" class="muted">
+            Enter a public wallet address.
+          </div>
+        </div>
+      </div>
+
+      <div class="notice">
+        This is a public-activity assessment, not a guarantee that a
+        wallet is uncompromised. A private-key compromise cannot be
+        proven from blockchain history alone.
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <h2>Wallet Overview</h2>
+
+      <div class="grid">
+
+        <div class="stat">
+          <small>Network</small>
+          <strong>Pi Network</strong>
+        </div>
+
+        <div class="stat">
+          <small>Address Status</small>
+          <strong id="addressStatus">Checking</strong>
+        </div>
+
+        <div class="stat">
+          <small>Balance</small>
+          <strong id="balance">Unavailable</strong>
+        </div>
+
+        <div class="stat">
+          <small>Transactions</small>
+          <strong id="txCount">Unavailable</strong>
+        </div>
+
+      </div>
+
+      <div style="margin-top:18px">
+        <small>Wallet Address</small>
+        <div id="walletAddress" class="address"></div>
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <h2>Receive Status</h2>
+
+      <div id="receiveStatus" class="status">
+        <div id="receiveDot" class="dot"></div>
+
+        <div>
+          <strong id="receiveTitle">
+            Address not checked
+          </strong>
+
+          <div id="receiveText" class="muted">
+            Scan the wallet first.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <h2>Transaction History</h2>
+
+      <div id="transactions">
+
+        <div class="loading">
+          Transaction history will appear here when blockchain
+          data is available.
+        </div>
+
+      </div>
+
+      <button class="secondary" onclick="refreshHistory()">
+        🔄 Refresh History
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <div class="footer">
+    Pi Wallet Scanner © 2026
+  </div>
+
+</div>
+
+
 <script>
 
-function scanWallet() {
+/*
+==========================================================
+PI WALLET SCANNER
+==========================================================
 
-  const wallet = document.getElementById("wallet").value.trim();
+IMPORTANT:
 
-  const result = document.getElementById("result");
-  const address = document.getElementById("address");
-  const status = document.getElementById("status");
+This frontend does NOT request:
+- wallet passphrases
+- seed phrases
+- private keys
 
-  if (!wallet) {
-    alert("Please enter a Pi wallet address.");
-    return;
+The security assessment only analyzes PUBLIC information.
+
+For production blockchain data, set API_BASE below to
+your own trusted backend/API endpoint.
+
+Do NOT put private API keys or secrets inside this file.
+==========================================================
+*/
+
+
+const API_BASE = "";
+
+
+/*
+----------------------------------------------------------
+Basic Pi public-address validation
+----------------------------------------------------------
+*/
+
+function isValidPiAddress(address){
+
+  if(!address){
+    return false;
   }
 
   /*
-    Basic public-address validation.
-
-    This does NOT request or store:
-    - wallet passphrases
-    - private keys
-    - seed phrases
+    Pi/Stellar public addresses normally begin with G.
+    Length is checked as a basic sanity test only.
   */
 
-  if (!wallet.startsWith("G") || wallet.length < 50) {
-    status.textContent = "Invalid or incomplete public address";
-    address.textContent = wallet;
-    result.style.display = "block";
+  return /^G[A-Z2-7]{55}$/.test(address);
+}
+
+
+/*
+----------------------------------------------------------
+Main scanner
+----------------------------------------------------------
+*/
+
+async function scanWallet(){
+
+  const address =
+    document.getElementById("wallet").value.trim();
+
+  if(!address){
+
+    alert("Please enter a Pi public wallet address.");
+
     return;
   }
 
-  status.textContent = "Public wallet address detected";
-  address.textContent = wallet;
+  document.getElementById("results")
+    .classList.remove("hidden");
 
-  result.style.display = "block";
+  document.getElementById("walletAddress")
+    .textContent = address;
+
+
+  /*
+  Address validation
+  */
+
+  const valid = isValidPiAddress(address);
+
+  if(valid){
+
+    document.getElementById("addressStatus")
+      .textContent = "Valid format";
+
+    setSecurity(
+      "good",
+      "No format problem detected",
+      "The address passes the basic public-address format check."
+    );
+
+    setReceive(
+      "good",
+      "Ready to receive",
+      "The address format appears valid. Always verify the address before sending."
+    );
+
+  }else{
+
+    document.getElementById("addressStatus")
+      .textContent = "Invalid format";
+
+    setSecurity(
+      "bad",
+      "Invalid address format",
+      "This does not look like a valid Pi public address."
+    );
+
+    setReceive(
+      "bad",
+      "Do not send",
+      "The address failed the basic validation check."
+    );
+
+    document.getElementById("balance")
+      .textContent = "—";
+
+    document.getElementById("txCount")
+      .textContent = "—";
+
+    document.getElementById("transactions").innerHTML =
+      '<div class="loading">No transaction data available.</div>';
+
+    return;
+  }
+
+
+  /*
+  Load blockchain information if a backend
+  endpoint has been configured.
+  */
+
+  if(API_BASE){
+
+    await loadWalletData(address);
+
+  }else{
+
+    /*
+      We deliberately do NOT invent balance or transactions.
+    */
+
+    document.getElementById("balance")
+      .textContent = "API required";
+
+    document.getElementById("txCount")
+      .textContent = "API required";
+
+    document.getElementById("transactions").innerHTML =
+
+      '<div class="loading">' +
+      'Blockchain history is not connected yet. ' +
+      'Connect a trusted Pi blockchain API through your backend.' +
+      '</div>';
+
+  }
+
+}
+
+
+/*
+----------------------------------------------------------
+Security status
+----------------------------------------------------------
+*/
+
+function setSecurity(type,title,text){
+
+  const dot =
+    document.getElementById("securityDot");
+
+  dot.className = "dot " + type;
+
+  document.getElementById("securityTitle")
+    .textContent = title;
+
+  document.getElementById("securityText")
+    .textContent = text;
+}
+
+
+/*
+----------------------------------------------------------
+Receive status
+----------------------------------------------------------
+*/
+
+function setReceive(type,title,text){
+
+  const dot =
+    document.getElementById("receiveDot");
+
+  dot.className = "dot " + type;
+
+  document.getElementById("receiveTitle")
+    .textContent = title;
+
+  document.getElementById("receiveText")
+    .textContent = text;
+}
+
+
+/*
+----------------------------------------------------------
+Blockchain data
+----------------------------------------------------------
+*/
+
+async function loadWalletData(address){
+
+  try{
+
+    const response =
+      await fetch(
+        API_BASE +
+        "/wallet/" +
+        encodeURIComponent(address)
+      );
+
+    if(!response.ok){
+
+      throw new Error(
+        "Blockchain API request failed"
+      );
+
+    }
+
+    const data =
+      await response.json();
+
+
+    /*
+      Expected backend response:
+
+      {
+        balance: "123.45",
+        transactionCount: 12,
+        transactions: [
+          {
+            id: "...",
+            direction: "incoming",
+            amount: "10",
+            timestamp: "...",
+            status: "successful"
+          }
+        ]
+      }
+    */
+
+
+    document.getElementById("balance")
+      .textContent =
+      data.balance ?? "Unknown";
+
+    document.getElementById("txCount")
+      .textContent =
+      data.transactionCount ?? "Unknown";
+
+
+    renderTransactions(
+      data.transactions || []
+    );
+
+
+    /*
+      Analyze public activity.
+    */
+
+    analyzeTransactions(
+      data.transactions || []
+    );
+
+
+  }catch(error){
+
+    console.error(error);
+
+    document.getElementById("balance")
+      .textContent = "Unavailable";
+
+    document.getElementById("txCount")
+      .textContent = "Unavailable";
+
+    document.getElementById("transactions").innerHTML =
+
+      '<div class="loading">' +
+      'Unable to retrieve blockchain data right now.' +
+      '</div>';
+
+    setSecurity(
+      "warn",
+      "Unable to complete security analysis",
+      "The wallet address is valid, but blockchain history could not be retrieved."
+    );
+
+  }
+
+}
+
+
+/*
+----------------------------------------------------------
+Transaction rendering
+----------------------------------------------------------
+*/
+
+function renderTransactions(transactions){
+
+  const container =
+    document.getElementById("transactions");
+
+  if(!transactions.length){
+
+    container.innerHTML =
+      '<div class="loading">' +
+      'No public transactions found.' +
+      '</div>';
+
+    return;
+  }
+
+
+  container.innerHTML =
+    transactions.map(tx => {
+
+      const direction =
+        tx.direction === "incoming"
+          ? "incoming"
+          : "outgoing";
+
+      const symbol =
+        direction === "incoming"
+          ? "↓"
+          : "↑";
+
+      return `
+
+        <div class="transaction">
+
+          <div class="tx-row">
+
+            <strong class="${direction}">
+              ${symbol}
+              ${escapeHTML(
+                tx.amount ?? "Unknown"
+              )} π
+            </strong>
+
+            <span class="muted">
+              ${escapeHTML(
+                tx.status ?? "Unknown"
+              )}
+            </span>
+
+          </div>
+
+          <div class="muted">
+            ${escapeHTML(
+              tx.timestamp ?? "Unknown date"
+            )}
+          </div>
+
+          <div class="muted">
+            Transaction:
+            ${escapeHTML(
+              tx.id ?? "Unknown"
+            )}
+          </div>
+
+        </div>
+
+      `;
+
+    }).join("");
+
+}
+
+
+/*
+----------------------------------------------------------
+Public activity risk analysis
+----------------------------------------------------------
+*/
+
+function analyzeTransactions(transactions){
+
+  if(!transactions.length){
+
+    setSecurity(
+      "warn",
+      "No transaction history",
+      "There is not enough public activity to perform a meaningful activity assessment."
+    );
+
+    return;
+  }
+
+
+  /*
+    These are conservative indicators only.
+    They do NOT prove compromise.
+  */
+
+  let suspicious = 0;
+
+
+  transactions.forEach(tx => {
+
+    const amount =
+      Number(tx.amount);
+
+    if(
+      Number.isFinite(amount) &&
+      amount > 100000
+    ){
+
+      suspicious++;
+    }
+
+    if(
+      tx.status &&
+      String(tx.status).toLowerCase()
+        .includes("failed")
+    ){
+
+      suspicious++;
+    }
+
+  });
+
+
+  if(suspicious === 0){
+
+    setSecurity(
+      "good",
+      "No obvious suspicious activity detected",
+      "The available public transaction history contains no indicators covered by this basic scanner."
+    );
+
+  }else{
+
+    setSecurity(
+      "warn",
+      "Activity requires review",
+      suspicious +
+      " transaction(s) matched a basic risk indicator. This does not prove the wallet is compromised."
+    );
+
+  }
+
+}
+
+
+/*
+----------------------------------------------------------
+Refresh
+----------------------------------------------------------
+*/
+
+function refreshHistory(){
+
+  const address =
+    document.getElementById("wallet")
+      .value.trim();
+
+  if(!isValidPiAddress(address)){
+
+    alert("Enter a valid Pi public wallet address first.");
+
+    return;
+  }
+
+  scanWallet();
+}
+
+
+/*
+----------------------------------------------------------
+HTML escaping
+----------------------------------------------------------
+*/
+
+function escapeHTML(value){
+
+  return String(value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
 }
 
 </script>
 
 </body>
-</html>
+  </html>
