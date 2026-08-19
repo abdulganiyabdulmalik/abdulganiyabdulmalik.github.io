@@ -1,12 +1,247 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Abdulganiy Abdulmalik</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pi Wallet Scanner</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #f5f3ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 520px;
+      background: white;
+      border-radius: 22px;
+      padding: 30px;
+      box-shadow: 0 10px 35px rgba(0,0,0,0.12);
+    }
+
+    .logo {
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 15px;
+      border-radius: 50%;
+      background: #6f42c1;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: bold;
+    }
+
+    h1 {
+      text-align: center;
+      color: #222;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #777;
+      margin-bottom: 28px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #333;
+    }
+
+    input {
+      width: 100%;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      font-size: 15px;
+      outline: none;
+      margin-bottom: 14px;
+    }
+
+    input:focus {
+      border-color: #6f42c1;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 12px;
+      background: #6f42c1;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #5b32a3;
+    }
+
+    .result {
+      display: none;
+      margin-top: 25px;
+      padding: 20px;
+      background: #f7f7f7;
+      border-radius: 15px;
+    }
+
+    .result h2 {
+      margin-bottom: 15px;
+      color: #222;
+    }
+
+    .item {
+      margin-bottom: 14px;
+    }
+
+    .item strong {
+      display: block;
+      color: #666;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .address {
+      word-break: break-all;
+      color: #6f42c1;
+    }
+
+    .warning {
+      margin-top: 20px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #fff4d6;
+      color: #705500;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 22px;
+      color: #999;
+      font-size: 12px;
+    }
+  </style>
 </head>
+
 <body>
-    <h1>Welcome</h1>
-    <p>My website is working.</p>
+
+  <div class="container">
+
+    <div class="logo">π</div>
+
+    <h1>Pi Wallet Scanner</h1>
+
+    <p class="subtitle">
+      Check a Pi public wallet address
+    </p>
+
+    <label for="wallet">Pi Wallet Address</label>
+
+    <input
+      id="wallet"
+      type="text"
+      placeholder="Paste your public wallet address"
+      autocomplete="off"
+    >
+
+    <button onclick="scanWallet()">
+      Scan Wallet
+    </button>
+
+    <div class="result" id="result">
+
+      <h2>Wallet Information</h2>
+
+      <div class="item">
+        <strong>Status</strong>
+        <span id="status">Valid format</span>
+      </div>
+
+      <div class="item">
+        <strong>Wallet Address</strong>
+        <span class="address" id="address"></span>
+      </div>
+
+      <div class="item">
+        <strong>Network</strong>
+        <span>Pi Network</span>
+      </div>
+
+      <div class="item">
+        <strong>Wallet Type</strong>
+        <span>Public Address</span>
+      </div>
+
+    </div>
+
+    <div class="warning">
+      ⚠️ Never enter your Pi wallet passphrase or private key.
+      This scanner only accepts a public wallet address.
+    </div>
+
+    <div class="footer">
+      Pi Wallet Scanner © 2026
+    </div>
+
+  </div>
+
+<script>
+
+function scanWallet() {
+
+  const wallet = document.getElementById("wallet").value.trim();
+
+  const result = document.getElementById("result");
+  const address = document.getElementById("address");
+  const status = document.getElementById("status");
+
+  if (!wallet) {
+    alert("Please enter a Pi wallet address.");
+    return;
+  }
+
+  /*
+    Basic public-address validation.
+
+    This does NOT request or store:
+    - wallet passphrases
+    - private keys
+    - seed phrases
+  */
+
+  if (!wallet.startsWith("G") || wallet.length < 50) {
+    status.textContent = "Invalid or incomplete public address";
+    address.textContent = wallet;
+    result.style.display = "block";
+    return;
+  }
+
+  status.textContent = "Public wallet address detected";
+  address.textContent = wallet;
+
+  result.style.display = "block";
+}
+
+</script>
+
 </body>
 </html>
