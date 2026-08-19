@@ -1,210 +1,1280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Pi Wallet Scanner</title>
+
+<!-- Pi Browser SDK -->
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:linear-gradient(135deg,#f7f3ff,#eee8ff);
+  color:#222;
+  min-height:100vh;
+  padding:18px;
+}
+
+.app{
+  max-width:760px;
+  margin:auto;
+}
+
+.header{
+  text-align:center;
+  padding:25px 10px 20px;
+}
+
+.logo{
+  width:78px;
+  height:78px;
+  margin:auto;
+  border-radius:50%;
+  background:linear-gradient(135deg,#7b45d3,#54229d);
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:42px;
+  font-weight:bold;
+  box-shadow:0 10px 30px rgba(84,34,157,.25);
+}
+
+h1{
+  margin-top:15px;
+  font-size:28px;
+}
+
+h2{
+  font-size:20px;
+  margin-bottom:14px;
+}
+
+.subtitle{
+  color:#777;
+  margin-top:7px;
+}
+
+.card{
+  background:rgba(255,255,255,.96);
+  border-radius:20px;
+  padding:22px;
+  margin-bottom:18px;
+  box-shadow:0 8px 28px rgba(0,0,0,.08);
+}
+
+label{
+  display:block;
+  font-weight:bold;
+  margin-bottom:9px;
+}
+
+input{
+  width:100%;
+  padding:16px;
+  border:1px solid #ddd;
+  border-radius:13px;
+  font-size:15px;
+  outline:none;
+}
+
+input:focus{
+  border-color:#6f42c1;
+  box-shadow:0 0 0 3px rgba(111,66,193,.1);
+}
+
+button{
+  width:100%;
+  margin-top:12px;
+  padding:16px;
+  border:0;
+  border-radius:13px;
+  background:linear-gradient(135deg,#7545c7,#5a2aa5);
+  color:white;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+  transition:.2s;
+}
+
+button:hover{
+  transform:translateY(-1px);
+}
+
+button:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+  transform:none;
+}
+
+.secondary{
+  background:#eeeeee;
+  color:#333;
+}
+
+.testnet-button{
+  background:linear-gradient(135deg,#8b5bd6,#6335ae);
+}
+
+.hidden{
+  display:none;
+}
+
+.status{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  padding:16px;
+  border-radius:14px;
+  margin-top:15px;
+  background:#f5f5f5;
+}
+
+.dot{
+  min-width:14px;
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  background:#999;
+  margin-top:3px;
+}
+
+.dot.good{
+  background:#20a447;
+}
+
+.dot.warn{
+  background:#e09a00;
+}
+
+.dot.bad{
+  background:#d93025;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:16px;
+}
+
+.stat{
+  background:#f7f7f7;
+  padding:16px;
+  border-radius:14px;
+}
+
+.stat small{
+  display:block;
+  color:#777;
+  margin-bottom:7px;
+}
+
+.stat strong{
+  font-size:18px;
+  word-break:break-word;
+}
+
+.address{
+  word-break:break-all;
+  color:#6f42c1;
+  font-size:13px;
+  line-height:1.5;
+}
+
+.notice{
+  background:#fff5d7;
+  color:#705500;
+  padding:14px;
+  border-radius:12px;
+  margin-top:15px;
+  font-size:13px;
+  line-height:1.5;
+}
+
+.testnet-notice{
+  background:#eee7ff;
+  color:#54229d;
+}
+
+.error{
+  background:#ffe9e9;
+  color:#9d1c1c;
+  padding:14px;
+  border-radius:12px;
+  margin-top:15px;
+  display:none;
+}
+
+.success{
+  background:#e8f8ed;
+  color:#176b32;
+  padding:14px;
+  border-radius:12px;
+  margin-top:15px;
+  display:none;
+}
+
+.loading{
+  text-align:center;
+  padding:22px;
+  color:#777;
+}
+
+.transaction{
+  padding:16px 0;
+  border-bottom:1px solid #eee;
+}
+
+.transaction:last-child{
+  border-bottom:0;
+}
+
+.tx-top{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:8px;
+}
+
+.incoming{
+  color:#16863a;
+  font-weight:bold;
+}
+
+.outgoing{
+  color:#c62828;
+  font-weight:bold;
+}
+
+.tx-id{
+  font-size:12px;
+  color:#777;
+  word-break:break-all;
+  line-height:1.5;
+}
+
+.tx-date{
+  font-size:12px;
+  color:#777;
+  margin-top:6px;
+}
+
+.tx-link{
+  display:inline-block;
+  margin-top:8px;
+  color:#6f42c1;
+  text-decoration:none;
+  font-size:13px;
+  font-weight:bold;
+}
+
+.badge{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:20px;
+  background:#eee7ff;
+  color:#5b2ba3;
+  font-size:12px;
+  font-weight:bold;
+  margin-bottom:12px;
+}
+
+.payment-id{
+  word-break:break-all;
+  font-size:12px;
+  color:#666;
+  margin-top:7px;
+}
+
+.footer{
+  text-align:center;
+  color:#999;
+  font-size:12px;
+  padding:20px;
+}
+
+@media(max-width:520px){
+
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  h1{
+    font-size:24px;
+  }
+
+  .tx-top{
+    flex-direction:column;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+
+    <div class="logo">π</div>
+
+    <h1>Pi Wallet Scanner</h1>
+
+    <p class="subtitle">
+      Public Pi wallet analysis & Testnet payment testing
+    </p>
+
+  </div>
+
+
+  <!-- WALLET SEARCH -->
+  <div class="card">
+
+    <label for="wallet">
+      Pi Public Wallet Address
+    </label>
+
+    <input
+      id="wallet"
+      type="text"
+      placeholder="Paste a Pi public address beginning with G..."
+      autocomplete="off"
+      spellcheck="false"
+    >
+
+    <button
+      id="scanButton"
+      onclick="scanWallet()"
+    >
+      🔎 Scan Wallet
+    </button>
+
+    <div id="errorBox" class="error"></div>
+
+    <div class="notice">
+      🔒 <strong>Security notice:</strong>
+      Never enter a Pi wallet passphrase, seed phrase or private key.
+      This scanner only uses publicly available blockchain information.
+    </div>
+
+  </div>
+
+
+  <!-- RESULTS -->
+  <div id="results" class="hidden">
+
+    <!-- SECURITY -->
+    <div class="card">
+
+      <h2>🛡️ Security Assessment</h2>
+
+      <div class="status">
+
+        <div id="securityDot" class="dot"></div>
+
+        <div>
+
+          <strong id="securityTitle">
+            Analyzing...
+          </strong>
+
+          <div
+            id="securityText"
+            class="tx-date"
+          >
+            Checking public blockchain activity.
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="notice">
+        This scanner cannot prove that a private key has never
+        been compromised. It only analyzes publicly visible
+        blockchain activity and reports basic indicators.
+      </div>
+
+    </div>
+
+
+    <!-- WALLET OVERVIEW -->
+    <div class="card">
+
+      <h2>💰 Wallet Overview</h2>
+
+      <div class="grid">
+
+        <div class="stat">
+          <small>Network</small>
+          <strong>Pi Mainnet</strong>
+        </div>
+
+        <div class="stat">
+          <small>Wallet</small>
+          <strong id="walletState">Checking...</strong>
+        </div>
+
+        <div class="stat">
+          <small>Available Balance</small>
+          <strong id="availableBalance">—</strong>
+        </div>
+
+        <div class="stat">
+          <small>Total Balance</small>
+          <strong id="totalBalance">—</strong>
+        </div>
+
+        <div class="stat">
+          <small>Transactions</small>
+          <strong id="transactionCount">—</strong>
+        </div>
+
+        <div class="stat">
+          <small>Sequence</small>
+          <strong id="sequence">—</strong>
+        </div>
+
+      </div>
+
+      <div style="margin-top:18px">
+
+        <small>Public Address</small>
+
+        <div
+          id="walletAddress"
+          class="address"
+          style="margin-top:7px"
+        ></div>
+
+      </div>
+
+    </div>
+
+
+    <!-- RECEIVE -->
+    <div class="card">
+
+      <h2>📥 Receive Status</h2>
+
+      <div class="status">
+
+        <div id="receiveDot" class="dot"></div>
+
+        <div>
+
+          <strong id="receiveTitle">
+            Checking...
+          </strong>
+
+          <div
+            id="receiveText"
+            class="tx-date"
+          >
+            Checking the public account.
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- TESTNET PAYMENT -->
+    <div class="card">
+
+      <span class="badge">
+        🧪 TESTNET ONLY
+      </span>
+
+      <h2>Pi Testnet Payment</h2>
+
+      <p class="subtitle">
+        Test the Pi User-to-App payment flow without using
+        real Mainnet Pi.
+      </p>
+
+      <div class="notice testnet-notice">
+
+        <strong>TESTNET ONLY</strong><br><br>
+
+        This payment is intended for development and testing.
+        Never enter your wallet passphrase or private key.
+
+      </div>
+
+      <div class="grid">
+
+        <div class="stat">
+
+          <small>Network</small>
+
+          <strong>
+            Pi Testnet
+          </strong>
+
+        </div>
+
+        <div class="stat">
+
+          <small>Test Amount</small>
+
+          <strong>
+            0.1 π
+          </strong>
+
+        </div>
+
+      </div>
+
+      <button
+        id="testPaymentButton"
+        class="testnet-button"
+        onclick="makeTestnetPayment()"
+      >
+        💳 Pay 0.1 π — Testnet
+      </button>
+
+      <div
+        id="paymentStatusBox"
+        class="status"
+      >
+
+        <div
+          id="paymentDot"
+          class="dot warn"
+        ></div>
+
+        <div>
+
+          <strong id="paymentStatusTitle">
+            Pi Testnet
+          </strong>
+
+          <div
+            id="paymentStatus"
+            class="tx-date"
+          >
+            Initializing Pi Testnet...
+          </div>
+
+        </div>
+
+      </div>
+
+      <div
+        id="paymentDetails"
+        class="hidden"
+        style="margin-top:15px"
+      >
+
+        <div class="stat">
+
+          <small>Payment ID</small>
+
+          <div
+            id="paymentId"
+            class="payment-id"
+          ></div>
+
+        </div>
+
+        <div
+          class="stat"
+          style="margin-top:10px"
+        >
+
+          <small>Transaction ID</small>
+
+          <div
+            id="transactionId"
+            class="payment-id"
+          ></div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- TRANSACTIONS -->
+    <div class="card">
+
+      <h2>📊 Transaction History</h2>
+
+      <div
+        id="transactions"
+        style="margin-top:10px"
+      >
+
+        <div class="loading">
+          Loading blockchain transactions...
+        </div>
+
+      </div>
+
+      <button
+        class="secondary"
+        onclick="scanWallet()"
+      >
+        🔄 Refresh Wallet
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <div class="footer">
+    Pi Wallet Scanner © 2026
+  </div>
+
+</div>
+
+
 <script>
+
+/* ==========================================================
+   PI CONFIGURATION
+========================================================== */
+
+const PI_API =
+  "https://api.mainnet.minepi.com";
+
 let piReady = false;
+
+
+/* ==========================================================
+   INITIALIZE PI TESTNET
+========================================================== */
 
 async function initializePi(){
 
   try{
 
+    if(typeof Pi === "undefined"){
+
+      setPaymentStatus(
+        "bad",
+        "Pi SDK unavailable",
+        "The Pi SDK could not be loaded."
+      );
+
+      return;
+
+    }
+
     await Pi.init({
-      version: "2.0",
-      sandbox: true
+
+      version:"2.0",
+
+      sandbox:true
+
     });
 
     piReady = true;
 
-    document.getElementById("paymentStatus").textContent =
-      "Pi Testnet is ready.";
+    setPaymentStatus(
+      "good",
+      "Pi Testnet is ready",
+      "You can test the 0.1 π payment flow."
+    );
 
   }catch(error){
 
     console.error(error);
 
-    document.getElementById("paymentStatus").textContent =
-      "Pi Testnet could not be initialized.";
+    setPaymentStatus(
+      "bad",
+      "Pi Testnet unavailable",
+      "The Pi SDK could not be initialized."
+    );
 
   }
 
 }
 
-initializePi();
-</script>async function makeTestnetPayment(){
 
-  if(!piReady){
+/* ==========================================================
+   WALLET ADDRESS VALIDATION
+========================================================== */
 
-    showPaymentStatus(
-      "Pi Testnet is not ready yet."
+function isValidPiAddress(address){
+
+  return /^G[A-Z2-7]{55}$/.test(address);
+
+}
+
+
+/* ==========================================================
+   WALLET SCANNER
+========================================================== */
+
+async function scanWallet(){
+
+  const input =
+    document.getElementById("wallet");
+
+  const button =
+    document.getElementById("scanButton");
+
+  const address =
+    input.value.trim();
+
+  hideError();
+
+  if(!address){
+
+    showError(
+      "Please enter a Pi public wallet address."
     );
 
     return;
 
   }
 
+  if(!isValidPiAddress(address)){
+
+    showError(
+      "That does not look like a valid Pi public wallet address. A public address normally begins with G and contains 56 characters."
+    );
+
+    return;
+
+  }
+
+
+  document
+    .getElementById("results")
+    .classList.remove("hidden");
+
+
+  document
+    .getElementById("walletAddress")
+    .textContent = address;
+
+
+  button.disabled = true;
+
+  button.textContent =
+    "🔎 Scanning...";
+
+
+  document
+    .getElementById("walletState")
+    .textContent =
+    "Checking...";
+
+  document
+    .getElementById("availableBalance")
+    .textContent =
+    "Loading...";
+
+  document
+    .getElementById("totalBalance")
+    .textContent =
+    "Loading...";
+
+  document
+    .getElementById("transactionCount")
+    .textContent =
+    "Loading...";
+
+  document
+    .getElementById("sequence")
+    .textContent =
+    "Loading...";
+
+
   try{
 
-    showPaymentStatus(
-      "Connecting to Pi Testnet..."
-    );
+    const response =
+      await fetch(
+        PI_API +
+        "/accounts/" +
+        encodeURIComponent(address)
+      );
 
-    const auth = await Pi.authenticate(
-      ["payments"],
-      onIncompletePaymentFound
-    );
 
-    console.log("Authenticated:", auth.user);
+    if(!response.ok){
 
-    Pi.createPayment({
+      if(response.status === 404){
 
-      amount: 0.1,
-
-      memo: "Pi Scanner Test Payment",
-
-      metadata: {
-        app: "Pi Wallet Scanner",
-        environment: "testnet",
-        purpose: "payment-flow-test"
-      }
-
-    },{
-
-      onReadyForServerApproval: function(paymentId){
-
-        console.log(
-          "Payment requires server approval:",
-          paymentId
-        );
-
-        showPaymentStatus(
-          "Payment created. Waiting for server approval..."
-        );
-
-        /*
-          IMPORTANT:
-          Send paymentId to YOUR BACKEND here.
-
-          Your backend must call:
-
-          POST /v2/payments/{payment_id}/approve
-
-          using your Pi Server API Key.
-
-          Never put the Server API Key in this HTML file.
-        */
-
-      },
-
-      onReadyForServerCompletion:
-        function(paymentId, txid){
-
-          console.log(
-            "Payment submitted:",
-            paymentId,
-            txid
-          );
-
-          showPaymentStatus(
-            "Payment submitted. Waiting for server completion..."
-          );
-
-          /*
-            Send paymentId + txid to your backend.
-
-            Your backend must call:
-
-            POST /v2/payments/{payment_id}/complete
-
-            with the txid.
-          */
-
-        },
-
-      onCancel: function(paymentId){
-
-        console.log(
-          "Payment cancelled:",
-          paymentId
-        );
-
-        showPaymentStatus(
-          "Payment cancelled."
-        );
-
-      },
-
-      onError: function(error, payment){
-
-        console.error(
-          "Payment error:",
-          error,
-          payment
-        );
-
-        showPaymentStatus(
-          "Payment failed: " +
-          (error.message || error)
+        throw new Error(
+          "This wallet address was not found on Pi Mainnet."
         );
 
       }
 
-    });
+      throw new Error(
+        "Pi Mainnet returned HTTP " +
+        response.status
+      );
+
+    }
+
+
+    const account =
+      await response.json();
+
+
+    const balances =
+      account.balances || [];
+
+
+    let available = "0";
+
+    let total = "0";
+
+
+    for(
+      const balance of balances
+    ){
+
+      if(
+        balance.asset_type === "native"
+      ){
+
+        available =
+          balance.balance || "0";
+
+        total =
+          balance.balance || "0";
+
+        break;
+
+      }
+
+    }
+
+
+    document
+      .getElementById("walletState")
+      .textContent =
+      "Found";
+
+
+    document
+      .getElementById("availableBalance")
+      .textContent =
+      formatPi(available) +
+      " π";
+
+
+    document
+      .getElementById("totalBalance")
+      .textContent =
+      formatPi(total) +
+      " π";
+
+
+    document
+      .getElementById("sequence")
+      .textContent =
+      account.sequence || "0";
+
+
+    setReceive(
+      "good",
+      "Account is active",
+      "This public address exists on Pi Mainnet and can be checked before receiving Pi."
+    );
+
+
+    await loadTransactions(address);
+
 
   }catch(error){
 
     console.error(error);
 
-    showPaymentStatus(
-      "Authentication/payment error: " +
-      (error.message || error)
+    showError(
+      error.message ||
+      "Unable to retrieve this wallet."
+    );
+
+
+    setSecurity(
+      "warn",
+      "Unable to complete analysis",
+      "The scanner could not retrieve public blockchain information."
+    );
+
+
+    setReceive(
+      "warn",
+      "Unable to verify",
+      "The public account could not be checked."
     );
 
   }
 
-}<div class="card">
 
-  <h2>🧪 Testnet Payment</h2>
+  button.disabled = false;
 
-  <div class="notice">
-    <strong>TESTNET ONLY</strong><br>
-    This payment feature is for testing the Pi payment
-    integration. Do not use it for real Mainnet payments.
-  </div>
+  button.textContent =
+    "🔎 Scan Wallet";
 
-  <div class="grid">
+}
 
-    <div class="stat">
-      <small>Network</small>
-      <strong>Pi Testnet</strong>
-    </div>
 
-    <div class="stat">
-      <small>Test Amount</small>
-      <strong>0.1 π</strong>
-    </div>
+/* ==========================================================
+   LOAD TRANSACTIONS
+========================================================== */
 
-  </div>
+async function loadTransactions(address){
 
-  <button
-    id="testPaymentButton"
-    onclick="makeTestnetPayment()"
-  >
-    💳 Pay 0.1 π (Testnet)
-  </button>
+  const container =
+    document.getElementById("transactions");
 
-  <div
-    id="paymentStatus"
-    class="status"
-    style="margin-top:15px"
-  >
-    <div class="dot warn"></div>
 
-    <div>
-      <strong>Testnet payment</strong>
+  container.innerHTML =
+    '<div class="loading">' +
+    'Loading transaction history...' +
+    '</div>';
 
-      <div class="tx-date">
-        Initializing Pi Testnet...
-      </div>
-    </div>
-  </div>
 
-</div>
+  try{
+
+    const url =
+      PI_API +
+      "/accounts/" +
+      encodeURIComponent(address) +
+      "/transactions?order=desc&limit=100";
+
+
+    const response =
+      await fetch(url);
+
+
+    if(!response.ok){
+
+      throw new Error(
+        "Could not load transaction history."
+      );
+
+    }
+
+
+    const data =
+      await response.json();
+
+
+    const records =
+      data._embedded &&
+      data._embedded.records
+        ? data._embedded.records
+        : [];
+
+
+    document
+      .getElementById("transactionCount")
+      .textContent =
+      records.length +
+      (
+        data._links &&
+        data._links.next
+          ? "+"
+          : ""
+      );
+
+
+    renderTransactions(
+      records
+    );
+
+
+    analyzeActivity(
+      records
+    );
+
+
+  }catch(error){
+
+    console.error(error);
+
+    container.innerHTML =
+      '<div class="loading">' +
+      'Transaction history could not be loaded.' +
+      '</div>';
+
+
+    setSecurity(
+      "warn",
+      "History unavailable",
+      "The wallet was found, but transaction history could not be retrieved."
+    );
+
+  }
+
+}
+
+
+/* ==========================================================
+   RENDER TRANSACTIONS
+========================================================== */
+
+function renderTransactions(records){
+
+  const container =
+    document.getElementById("transactions");
+
+
+  if(!records.length){
+
+    container.innerHTML =
+      '<div class="loading">' +
+      'No public transactions were returned for this account.' +
+      '</div>';
+
+    setSecurity(
+      "good",
+      "No obvious suspicious activity",
+      "No public transaction history was returned for this account."
+    );
+
+    return;
+
+  }
+
+
+  container.innerHTML =
+    records.map(
+      tx => {
+
+        const id =
+          tx.id ||
+          "Unknown";
+
+
+        const created =
+          tx.created_at
+            ? new Date(
+                tx.created_at
+              ).toLocaleString()
+            : "Unknown";
+
+
+        const successful =
+          tx.successful === true;
+
+
+        const status =
+          successful
+            ? "Successful"
+            : "Failed";
+
+
+        let amount = "";
+
+
+        if(tx.amount){
+
+          amount =
+            formatPi(tx.amount) +
+            " π";
+
+        }
+
+
+        return `
+
+          <div class="transaction">
+
+            <div class="tx-top">
+
+              <span
+                class="${
+                  successful
+                    ? "incoming"
+                    : "outgoing"
+                }"
+              >
+
+                ${
+                  successful
+                    ? "✓"
+                    : "⚠"
+                }
+
+                ${status}
+
+                ${
+                  amount
+                    ? " • " +
+                      amount
+                    : ""
+                }
+
+              </span>
+
+              <span class="tx-date">
+                ${escapeHTML(created)}
+              </span>
+
+            </div>
+
+            <div class="tx-id">
+
+              Transaction ID:
+
+              ${escapeHTML(id)}
+
+            </div>
+
+            <a
+              class="tx-link"
+              href="${PI_EXPLORER_URL(id)}"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View transaction ↗
+            </a>
+
+          </div>
+
+        `;
+
+      }
+    ).join("");
+
+}
+
+
+/* ==========================================================
+   ACTIVITY ANALYSIS
+========================================================== */
+
+function analyzeActivity(records){
+
+  let failed = 0;
+
+
+  for(
+    const tx of records
+  ){
+
+    if(
+      tx.successful === false
+    ){
+
+      failed++;
+
+    }
+
+  }
+
+
+  if(failed === 0){
+
+    setSecurity(
+      "good",
+      "No obvious suspicious activity detected",
+      "The available public transaction history contains no failed transactions flagged by this basic scanner."
+    );
+
+  }else{
+
+    setSecurity(
+      "warn",
+      "Activity requires review",
+      failed +
+      " failed transaction(s) were found. This does not prove that the wallet is compromised."
+    );
+
+  }
+
+}
+
+
+/* ==========================================================
+   TESTNET PAYMENT
+========================================================== */
+
+async function makeTestnetPayment(){
+
+  const button =
+    document.getElementById(
+      "testPaymentButton"
+    );
+
+
+  if(!piReady){
+
+    setPaymentStatus(
+      "warn",
+      "Pi Testnet is not ready",
+      "Please wait for Pi Testnet to initialize."
+    );
+
+    return;
+
+  }
+
+
+  try{
+
+    button.disabled = true;
+
+    button.textContent =
+      "⏳ Connecting...";
+
+
+    setPaymentStatus(
+      "warn",
+      "Connecting to Pi",
+      "Opening the Pi Testnet payment flow..."
+    );
+
+
+    const auth =
+      await Pi.authenticate(
+        ["payments"],
+        onIncompletePaymentFound
+      );
+
+
+    console.log(
+      "Authenticated:",
+      auth.user
+    );
+
+
+    setPaymentStatus(
+      "warn",
+      "Creating payment",
+      "Waiting for the Pi payment confirmation..."
+    );
+
+
+    Pi.createPayment(
+
+      {
+
+        amount:0.1,
+
+        memo:
+          "Pi Scanner Test Payment",
+
+        metadata:{
+
+          app:
+            "Pi Wallet Scanner",
+
+          environment:
+            "testnet",
+
+          purpose:
