@@ -265,7 +265,7 @@
 
       <div class="field">
         <label for="address-input">Public address</label>
-        <input type="text" id="address-input" placeholder="GABCDXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" autocomplete="off" spellcheck="false">
+        <input type="text" id="address-input" placeholder="GABCDXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
         <div class="helptext" id="validation-msg"></div>
       </div>
 
@@ -419,10 +419,19 @@ browser-visible network request.</pre>
     return crc;
   }
 
+  // Strips zero-width/invisible characters and internal whitespace that
+  // mobile keyboards and clipboard managers sometimes inject on paste.
+  function normalizeAddress(address){
+    return address
+      .replace(/[\u200B-\u200D\uFEFF]/g, '')  // zero-width chars
+      .replace(/\s+/g, '')                     // any whitespace, anywhere
+      .toUpperCase();
+  }
+
   // Returns { valid: bool, reason: string }
   function validatePiAddress(address){
     if (!address) return { valid:false, reason:'Enter an address.' };
-    address = address.trim();
+    address = normalizeAddress(address);
     if (address.length !== 56) return { valid:false, reason:'Address must be exactly 56 characters (got ' + address.length + ').' };
     if (address[0] !== 'G') return { valid:false, reason:'Public addresses start with "G".' };
     if (!/^[A-Z2-7]+$/.test(address)) return { valid:false, reason:'Contains invalid base32 characters.' };
@@ -462,19 +471,4 @@ browser-visible network request.</pre>
   var addressInput = document.getElementById('address-input');
   var validationMsg = document.getElementById('validation-msg');
   var scanBtn = document.getElementById('scan-btn');
-  var refreshBtn = document.getElementById('refresh-btn');
-  var clearBtn = document.getElementById('clear-btn');
-
-  var currentAddress = null;
-
-  function renderValidation(){
-    var val = addressInput.value.trim();
-    if (!val){
-      validationMsg.innerHTML = '';
-      scanBtn.disabled = true;
-      return;
-    }
-    var result = validatePiAddress(val);
-    var badgeClass = result.valid ? 'valid' : 'invalid';
-    var icon = result.valid ? '✓' : '✕';
-    validatio
+  var refreshBtn = document.getElementById('
