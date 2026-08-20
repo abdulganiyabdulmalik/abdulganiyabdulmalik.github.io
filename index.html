@@ -6,6 +6,9 @@
 
 <title>Pi Wallet Scanner</title>
 
+<!-- Pi SDK -->
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+
 <style>
 *{
   box-sizing:border-box;
@@ -28,7 +31,7 @@ body{
 
 .header{
   text-align:center;
-  padding:30px 10px;
+  padding:25px 10px;
 }
 
 .logo{
@@ -37,12 +40,13 @@ body{
   margin:auto;
   border-radius:50%;
   background:#6f42c1;
-  color:#fff;
+  color:white;
   display:flex;
   align-items:center;
   justify-content:center;
   font-size:40px;
   font-weight:bold;
+  box-shadow:0 8px 25px rgba(0,0,0,.15);
 }
 
 h1{
@@ -52,11 +56,11 @@ h1{
 
 .subtitle{
   color:#777;
-  margin-top:8px;
+  margin-top:7px;
 }
 
 .card{
-  background:#fff;
+  background:white;
   border-radius:20px;
   padding:22px;
   margin-bottom:18px;
@@ -78,6 +82,10 @@ input{
   outline:none;
 }
 
+input:focus{
+  border-color:#6f42c1;
+}
+
 button{
   width:100%;
   margin-top:12px;
@@ -85,65 +93,179 @@ button{
   border:0;
   border-radius:12px;
   background:#6f42c1;
-  color:#fff;
+  color:white;
   font-size:16px;
   font-weight:bold;
   cursor:pointer;
 }
 
-button:active{
-  transform:scale(.98);
+button:disabled{
+  opacity:.6;
+  cursor:not-allowed;
 }
 
-.status{
-  margin-top:15px;
-  padding:15px;
-  border-radius:12px;
-  background:#eee;
-  line-height:1.5;
-}
-
-.good{
-  background:#e8f7ed;
-  color:#176b35;
-}
-
-.warn{
-  background:#fff4d6;
-  color:#705500;
-}
-
-.error{
-  background:#ffe8e8;
-  color:#9d1c1c;
+.secondary{
+  background:#eeeeee;
+  color:#333;
 }
 
 .hidden{
   display:none;
 }
 
-.notice{
+.status{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  padding:16px;
+  border-radius:14px;
   margin-top:15px;
-  padding:14px;
-  border-radius:12px;
-  background:#fff5d7;
-  color:#705500;
-  font-size:13px;
+  background:#f4f4f4;
   line-height:1.5;
 }
 
-.result{
-  margin-top:15px;
-  padding:16px;
+.dot{
+  min-width:14px;
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  background:#999;
+  margin-top:4px;
+}
+
+.dot.good{
+  background:#20a447;
+}
+
+.dot.warn{
+  background:#e09a00;
+}
+
+.dot.bad{
+  background:#d93025;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:16px;
+}
+
+.stat{
   background:#f7f7f7;
+  padding:16px;
   border-radius:14px;
+}
+
+.stat small{
+  display:block;
+  color:#777;
+  margin-bottom:7px;
+}
+
+.stat strong{
+  font-size:18px;
+  word-break:break-word;
 }
 
 .address{
   word-break:break-all;
   color:#6f42c1;
   font-size:13px;
+  line-height:1.5;
+}
+
+.notice{
+  background:#fff5d7;
+  color:#705500;
+  padding:14px;
+  border-radius:12px;
+  margin-top:15px;
+  font-size:13px;
+  line-height:1.5;
+}
+
+.error{
+  background:#ffe9e9;
+  color:#9d1c1c;
+  padding:14px;
+  border-radius:12px;
+  margin-top:15px;
+  display:none;
+}
+
+.loading{
+  text-align:center;
+  padding:22px;
+  color:#777;
+}
+
+.transaction{
+  padding:16px 0;
+  border-bottom:1px solid #eee;
+}
+
+.transaction:last-child{
+  border-bottom:0;
+}
+
+.tx-top{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:8px;
+}
+
+.success{
+  color:#16863a;
+  font-weight:bold;
+}
+
+.failed{
+  color:#c62828;
+  font-weight:bold;
+}
+
+.tx-id{
+  font-size:12px;
+  color:#777;
+  word-break:break-all;
+  line-height:1.5;
+}
+
+.tx-date{
+  font-size:12px;
+  color:#777;
+  margin-top:6px;
+}
+
+.tx-link{
+  display:inline-block;
   margin-top:8px;
+  color:#6f42c1;
+  text-decoration:none;
+  font-size:13px;
+  font-weight:bold;
+}
+
+.payment-box{
+  background:#faf8ff;
+  border:1px solid #e5ddff;
+  padding:18px;
+  border-radius:16px;
+  margin-top:15px;
+}
+
+.testnet{
+  display:inline-block;
+  background:#fff0c2;
+  color:#735600;
+  padding:6px 10px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:bold;
+  margin-top:10px;
 }
 
 .footer{
@@ -151,6 +273,22 @@ button:active{
   color:#999;
   font-size:12px;
   padding:20px;
+}
+
+@media(max-width:520px){
+
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  h1{
+    font-size:24px;
+  }
+
+  .tx-top{
+    flex-direction:column;
+  }
+
 }
 </style>
 </head>
@@ -166,29 +304,40 @@ button:active{
     <h1>Pi Wallet Scanner</h1>
 
     <p class="subtitle">
-      Public Pi wallet analysis
+      Public Pi wallet analysis & security checks
     </p>
 
   </div>
 
 
-  <!-- JAVASCRIPT STATUS -->
+  <!-- SYSTEM STATUS -->
 
   <div class="card">
 
     <strong>System Status</strong>
 
-    <div
-      id="systemStatus"
-      class="status warn"
-    >
-      Checking JavaScript...
+    <div class="status">
+
+      <div id="systemDot" class="dot warn"></div>
+
+      <div>
+
+        <strong id="systemTitle">
+          Initializing...
+        </strong>
+
+        <div id="systemText" class="tx-date">
+          Starting Pi Scanner.
+        </div>
+
+      </div>
+
     </div>
 
   </div>
 
 
-  <!-- WALLET SCANNER -->
+  <!-- WALLET SEARCH -->
 
   <div class="card">
 
@@ -203,7 +352,7 @@ button:active{
     <input
       id="wallet"
       type="text"
-      placeholder="Paste Pi public address beginning with G..."
+      placeholder="Paste a Pi public address beginning with G..."
       autocomplete="off"
       spellcheck="false"
     >
@@ -216,14 +365,20 @@ button:active{
     </button>
 
     <div
-      id="scanStatus"
-      class="status hidden"
+      id="errorBox"
+      class="error"
     ></div>
 
     <div class="notice">
-      🔒 Never enter a seed phrase, wallet passphrase
-      or private key. This scanner only works with
-      public blockchain information.
+
+      🔒 <strong>Security notice:</strong>
+
+      Never enter a Pi wallet passphrase,
+      seed phrase or private key.
+
+      This scanner only uses publicly available
+      blockchain information.
+
     </div>
 
   </div>
@@ -233,76 +388,277 @@ button:active{
 
   <div
     id="results"
-    class="card hidden"
+    class="hidden"
   >
 
-    <h2>Wallet Result</h2>
 
-    <div class="result">
+    <!-- SECURITY -->
 
-      <strong>Public Address</strong>
+    <div class="card">
+
+      <h2>Security Assessment</h2>
+
+      <div class="status">
+
+        <div
+          id="securityDot"
+          class="dot"
+        ></div>
+
+        <div>
+
+          <strong id="securityTitle">
+            Analyzing...
+          </strong>
+
+          <div
+            id="securityText"
+            class="tx-date"
+          >
+            Checking public activity.
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="notice">
+
+        This scanner cannot prove that a private
+        key has never been compromised.
+
+        It only analyzes publicly visible
+        blockchain activity.
+
+      </div>
+
+    </div>
+
+
+    <!-- WALLET OVERVIEW -->
+
+    <div class="card">
+
+      <h2>Wallet Overview</h2>
+
+      <div class="grid">
+
+        <div class="stat">
+
+          <small>Network</small>
+
+          <strong>
+            Pi Mainnet
+          </strong>
+
+        </div>
+
+
+        <div class="stat">
+
+          <small>Wallet</small>
+
+          <strong id="walletState">
+            Checking...
+          </strong>
+
+        </div>
+
+
+        <div class="stat">
+
+          <small>Available Balance</small>
+
+          <strong id="availableBalance">
+            —
+          </strong>
+
+        </div>
+
+
+        <div class="stat">
+
+          <small>Total Balance</small>
+
+          <strong id="totalBalance">
+            —
+          </strong>
+
+        </div>
+
+
+        <div class="stat">
+
+          <small>Transactions</small>
+
+          <strong id="transactionCount">
+            —
+          </strong>
+
+        </div>
+
+
+        <div class="stat">
+
+          <small>Sequence</small>
+
+          <strong id="sequence">
+            —
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <div style="margin-top:18px">
+
+        <small>
+          Public Address
+        </small>
+
+        <div
+          id="walletAddress"
+          class="address"
+          style="margin-top:7px"
+        ></div>
+
+      </div>
+
+    </div>
+
+
+    <!-- RECEIVE -->
+
+    <div class="card">
+
+      <h2>Receive Status</h2>
+
+      <div class="status">
+
+        <div
+          id="receiveDot"
+          class="dot"
+        ></div>
+
+        <div>
+
+          <strong id="receiveTitle">
+            Checking...
+          </strong>
+
+          <div
+            id="receiveText"
+            class="tx-date"
+          >
+            Checking public account.
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- TRANSACTIONS -->
+
+    <div class="card">
+
+      <h2>Transaction History</h2>
 
       <div
-        id="walletAddress"
-        class="address"
-      ></div>
+        id="transactions"
+        style="margin-top:10px"
+      >
 
-    </div>
+        <div class="loading">
+          No wallet scanned yet.
+        </div>
 
-    <div class="result">
+      </div>
 
-      <strong>Network</strong>
-
-      <br><br>
-
-      Pi Mainnet
-
-    </div>
-
-    <div class="result">
-
-      <strong>Scanner Status</strong>
-
-      <br><br>
-
-      <span id="walletResult">
-        Checking...
-      </span>
+      <button
+        id="refreshButton"
+        class="secondary"
+        type="button"
+      >
+        🔄 Refresh Wallet
+      </button>
 
     </div>
 
   </div>
 
 
-  <!-- TESTNET -->
+  <!-- TESTNET PAYMENT -->
 
   <div class="card">
 
     <h2>🧪 Testnet Payment</h2>
 
-    <div class="notice">
+    <span class="testnet">
+      TESTNET ONLY
+    </span>
 
-      <strong>TESTNET ONLY</strong>
+    <div class="payment-box">
 
-      <br><br>
+      <p>
+        Test the Pi payment integration
+        without using a real Mainnet payment.
+      </p>
 
-      This section is for testing the Pi payment
-      integration. It does not process real Mainnet
-      payments.
+      <br>
+
+      <div class="grid">
+
+        <div class="stat">
+
+          <small>Network</small>
+
+          <strong>
+            Pi Testnet
+          </strong>
+
+        </div>
+
+        <div class="stat">
+
+          <small>Test Amount</small>
+
+          <strong>
+            0.1 π
+          </strong>
+
+        </div>
+
+      </div>
+
+      <button
+        id="paymentButton"
+        type="button"
+      >
+        💳 Pay 0.1 π (Testnet)
+      </button>
+
+      <div
+        id="paymentStatus"
+        class="status hidden"
+      ></div>
 
     </div>
 
-    <button
-      id="paymentButton"
-      type="button"
-    >
-      💳 Pay 0.1 π (Testnet)
-    </button>
+    <div class="notice">
 
-    <div
-      id="paymentStatus"
-      class="status hidden"
-    ></div>
+      This payment flow requires your secure
+      backend for server approval and completion.
+
+      <strong>
+        Never put your Pi Server API Key inside
+        this HTML file.
+      </strong>
+
+    </div>
 
   </div>
 
@@ -319,165 +675,733 @@ button:active{
 <script>
 
 /*
-========================================================
-PI SCANNER TEST VERSION
-========================================================
+===========================================================
+PI WALLET SCANNER
+===========================================================
 
-This version intentionally keeps the JavaScript simple.
+Frontend responsibilities:
 
-First we confirm that JavaScript is executing on the
-live PiNet page.
+✓ Public wallet lookup
+✓ Public transaction lookup
+✓ Basic security indicators
+✓ Pi SDK authentication
+✓ Testnet payment creation
 
-Only after that will we reconnect the full blockchain
-scanner and payment backend.
-========================================================
+Backend responsibilities:
+
+✓ Payment approval
+✓ Payment completion
+✓ Server API authentication
+
+Never expose the Pi Server API Key in this file.
+===========================================================
 */
 
 
-document.addEventListener(
-  "DOMContentLoaded",
-  function(){
+const PI_API =
+  "https://api.mainnet.minepi.com";
 
-    /*
-    --------------------------------------------
-    JAVASCRIPT IS WORKING
-    --------------------------------------------
-    */
 
-    const systemStatus =
-      document.getElementById(
-        "systemStatus"
+/*
+-----------------------------------------------------------
+BACKEND ENDPOINTS
+-----------------------------------------------------------
+
+Change these later when your backend is deployed.
+
+Example:
+
+https://your-backend.com/approve
+https://your-backend.com/complete
+-----------------------------------------------------------
+*/
+
+const BACKEND_APPROVE =
+  "/approve";
+
+const BACKEND_COMPLETE =
+  "/complete";
+
+
+let piReady = false;
+
+
+/*
+===========================================================
+SYSTEM STATUS
+===========================================================
+*/
+
+function setSystem(type,title,text){
+
+  const dot =
+    document.getElementById("systemDot");
+
+  dot.className =
+    "dot " + type;
+
+  document
+    .getElementById("systemTitle")
+    .textContent = title;
+
+  document
+    .getElementById("systemText")
+    .textContent = text;
+
+}
+
+
+/*
+===========================================================
+PI SDK INITIALIZATION
+===========================================================
+*/
+
+function initializePi(){
+
+  try{
+
+    if(
+      typeof window.Pi ===
+      "undefined"
+    ){
+
+      setSystem(
+        "warn",
+        "Pi SDK not available",
+        "The scanner can still perform public wallet checks, but Pi payment features require the Pi Browser environment."
       );
 
-    systemStatus.textContent =
-      "JavaScript is active. Buttons are ready.";
+      return;
 
-    systemStatus.className =
-      "status good";
+    }
 
 
     /*
-    --------------------------------------------
-    SCAN BUTTON
-    --------------------------------------------
+      Pi SDK initialization.
+
+      The SDK may require the current Pi Browser
+      environment and configured app settings.
     */
 
-    const scanButton =
-      document.getElementById(
-        "scanButton"
-      );
-
-    scanButton.addEventListener(
-      "click",
-      function(){
-
-        const wallet =
-          document
-            .getElementById("wallet")
-            .value
-            .trim();
-
-        const scanStatus =
-          document.getElementById(
-            "scanStatus"
-          );
+    Pi.init({
+      version:"2.0",
+      sandbox:true
+    });
 
 
-        if(!wallet){
-
-          scanStatus.textContent =
-            "Please enter your Pi public wallet address.";
-
-          scanStatus.className =
-            "status error";
-
-          scanStatus.classList.remove(
-            "hidden"
-          );
-
-          return;
-
-        }
+    piReady = true;
 
 
-        scanStatus.textContent =
-          "Button is working. Wallet address received.";
-
-        scanStatus.className =
-          "status good";
-
-        scanStatus.classList.remove(
-          "hidden"
-        );
-
-
-        document
-          .getElementById(
-            "results"
-          )
-          .classList.remove(
-            "hidden"
-          );
-
-
-        document
-          .getElementById(
-            "walletAddress"
-          )
-          .textContent =
-          wallet;
-
-
-        document
-          .getElementById(
-            "walletResult"
-          )
-          .textContent =
-          "Frontend scanner is working.";
-
-      }
+    setSystem(
+      "good",
+      "System ready",
+      "Pi Scanner is loaded. Testnet payment mode is enabled."
     );
 
+  }catch(error){
 
-    /*
-    --------------------------------------------
-    TESTNET BUTTON
-    --------------------------------------------
-    */
+    console.error(
+      "Pi initialization error:",
+      error
+    );
 
-    const paymentButton =
-      document.getElementById(
-        "paymentButton"
-      );
-
-
-    paymentButton.addEventListener(
-      "click",
-      function(){
-
-        const status =
-          document.getElementById(
-            "paymentStatus"
-          );
-
-
-        status.textContent =
-          "Testnet payment button is working. Secure Pi payment backend will be connected separately.";
-
-        status.className =
-          "status good";
-
-        status.classList.remove(
-          "hidden"
-        );
-
-      }
+    setSystem(
+      "warn",
+      "Scanner ready",
+      "Public wallet scanning is available. Pi payment initialization needs to be completed in the Pi Browser environment."
     );
 
   }
-);
 
-</script>
+}
 
-</body>
-      </html>
+
+/*
+===========================================================
+ADDRESS VALIDATION
+===========================================================
+*/
+
+function isValidPiAddress(address){
+
+  return /^G[A-Z2-7]{55}$/.test(
+    address
+  );
+
+}
+
+
+/*
+===========================================================
+SCAN WALLET
+===========================================================
+*/
+
+async function scanWallet(){
+
+  const input =
+    document.getElementById(
+      "wallet"
+    );
+
+  const button =
+    document.getElementById(
+      "scanButton"
+    );
+
+  const address =
+    input.value.trim();
+
+
+  hideError();
+
+
+  if(!address){
+
+    showError(
+      "Please enter a Pi public wallet address."
+    );
+
+    return;
+
+  }
+
+
+  if(
+    !isValidPiAddress(address)
+  ){
+
+    showError(
+      "Invalid Pi public address. A standard public address begins with G and contains 56 characters."
+    );
+
+    return;
+
+  }
+
+
+  document
+    .getElementById("results")
+    .classList.remove(
+      "hidden"
+    );
+
+
+  document
+    .getElementById("walletAddress")
+    .textContent =
+    address;
+
+
+  button.disabled = true;
+
+  button.textContent =
+    "🔎 Scanning...";
+
+
+  resetResults();
+
+
+  try{
+
+    const response =
+      await fetch(
+        PI_API +
+        "/accounts/" +
+        encodeURIComponent(
+          address
+        )
+      );
+
+
+    if(!response.ok){
+
+      if(
+        response.status ===
+        404
+      ){
+
+        throw new Error(
+          "This public wallet was not found on Pi Mainnet."
+        );
+
+      }
+
+
+      throw new Error(
+        "Pi Mainnet returned HTTP " +
+        response.status
+      );
+
+    }
+
+
+    const account =
+      await response.json();
+
+
+    const balances =
+      account.balances || [];
+
+
+    let balance =
+      "0";
+
+
+    for(
+      const item of balances
+    ){
+
+      if(
+        item.asset_type ===
+        "native"
+      ){
+
+        balance =
+          item.balance || "0";
+
+        break;
+
+      }
+
+    }
+
+
+    document
+      .getElementById(
+        "walletState"
+      )
+      .textContent =
+      "Found";
+
+
+    document
+      .getElementById(
+        "availableBalance"
+      )
+      .textContent =
+      formatPi(balance) +
+      " π";
+
+
+    document
+      .getElementById(
+        "totalBalance"
+      )
+      .textContent =
+      formatPi(balance) +
+      " π";
+
+
+    document
+      .getElementById(
+        "sequence"
+      )
+      .textContent =
+      account.sequence ||
+      "0";
+
+
+    setReceive(
+      "good",
+      "Account found",
+      "The public account exists and can be checked for blockchain activity."
+    );
+
+
+    await loadTransactions(
+      address
+    );
+
+
+  }catch(error){
+
+    console.error(error);
+
+
+    showError(
+      error.message ||
+      "Unable to retrieve wallet information."
+    );
+
+
+    setSecurity(
+      "warn",
+      "Unable to complete analysis",
+      "The public blockchain information could not be retrieved."
+    );
+
+
+    setReceive(
+      "warn",
+      "Unable to verify",
+      "The account could not be checked."
+    );
+
+  }
+
+
+  button.disabled = false;
+
+  button.textContent =
+    "🔎 Scan Wallet";
+
+}
+
+
+/*
+===========================================================
+LOAD TRANSACTIONS
+===========================================================
+*/
+
+async function loadTransactions(
+  address
+){
+
+  const container =
+    document.getElementById(
+      "transactions"
+    );
+
+
+  container.innerHTML =
+    '<div class="loading">Loading blockchain transactions...</div>';
+
+
+  try{
+
+    const url =
+      PI_API +
+      "/accounts/" +
+      encodeURIComponent(
+        address
+      ) +
+      "/transactions?order=desc&limit=100";
+
+
+    const response =
+      await fetch(url);
+
+
+    if(!response.ok){
+
+      throw new Error(
+        "Transaction history could not be loaded."
+      );
+
+    }
+
+
+    const data =
+      await response.json();
+
+
+    const records =
+      data._embedded &&
+      data._embedded.records
+        ? data._embedded.records
+        : [];
+
+
+    document
+      .getElementById(
+        "transactionCount"
+      )
+      .textContent =
+      records.length +
+      (
+        data._links &&
+        data._links.next
+          ? "+"
+          : ""
+      );
+
+
+    renderTransactions(
+      records
+    );
+
+
+    analyzeActivity(
+      records
+    );
+
+
+  }catch(error){
+
+    console.error(error);
+
+
+    container.innerHTML =
+      '<div class="loading">Transaction history could not be loaded.</div>';
+
+
+    setSecurity(
+      "warn",
+      "History unavailable",
+      "The wallet was found, but transaction history could not be retrieved."
+    );
+
+  }
+
+}
+
+
+/*
+===========================================================
+RENDER TRANSACTIONS
+===========================================================
+*/
+
+function renderTransactions(
+  records
+){
+
+  const container =
+    document.getElementById(
+      "transactions"
+    );
+
+
+  if(!records.length){
+
+    container.innerHTML =
+      '<div class="loading">No public transactions were returned.</div>';
+
+    return;
+
+  }
+
+
+  container.innerHTML =
+    records.map(
+      function(tx){
+
+        const id =
+          tx.id ||
+          "Unknown";
+
+
+        const date =
+          tx.created_at
+            ? new Date(
+                tx.created_at
+              ).toLocaleString()
+            : "Unknown";
+
+
+        const successful =
+          tx.successful === true;
+
+
+        return `
+
+          <div class="transaction">
+
+            <div class="tx-top">
+
+              <span class="${
+                successful
+                  ? "success"
+                  : "failed"
+              }">
+
+                ${
+                  successful
+                    ? "✓ Successful"
+                    : "⚠ Failed"
+                }
+
+              </span>
+
+              <span class="tx-date">
+
+                ${escapeHTML(date)}
+
+              </span>
+
+            </div>
+
+
+            <div class="tx-id">
+
+              Transaction ID:
+
+              ${escapeHTML(id)}
+
+            </div>
+
+
+            <a
+              class="tx-link"
+              href="${PI_EXPLORER_URL(id)}"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View transaction ↗
+            </a>
+
+          </div>
+
+        `;
+
+      }
+    ).join("");
+
+}
+
+
+/*
+===========================================================
+ACTIVITY ANALYSIS
+===========================================================
+*/
+
+function analyzeActivity(
+  records
+){
+
+  let failed = 0;
+
+
+  records.forEach(
+    function(tx){
+
+      if(
+        tx.successful === false
+      ){
+
+        failed++;
+
+      }
+
+    }
+  );
+
+
+  if(failed === 0){
+
+    setSecurity(
+      "good",
+      "No obvious suspicious activity",
+      "No failed transactions were found in the available public transaction history."
+    );
+
+  }else{
+
+    setSecurity(
+      "warn",
+      "Activity requires review",
+      failed +
+      " failed transaction(s) were found. This does not prove that the wallet is compromised."
+    );
+
+  }
+
+}
+
+
+/*
+===========================================================
+SECURITY UI
+===========================================================
+*/
+
+function setSecurity(
+  type,
+  title,
+  text
+){
+
+  const dot =
+    document.getElementById(
+      "securityDot"
+    );
+
+
+  dot.className =
+    "dot " + type;
+
+
+  document
+    .getElementById(
+      "securityTitle"
+    )
+    .textContent =
+    title;
+
+
+  document
+    .getElementById(
+      "securityText"
+    )
+    .textContent =
+    text;
+
+}
+
+
+/*
+===========================================================
+RECEIVE UI
+===========================================================
+*/
+
+function setReceive(
+  type,
+  title,
+  text
+){
+
+  const dot =
+    document.getElementById(
+      "receiveDot"
+    );
+
+
+  dot.className =
+    "dot " + type;
+
+
+  document
+    .getElementById(
+      "receiveTitle"
+    )
+    .textContent =
+    title;
+
+
+  document
+    .getElementById(
+      "receiveText"
+    )
+    .textContent =
+    text;
+
+}
+
+
+/*
+===========================================================
+RESET RESULTS
+===========================================================
+*/
+
+function resetResults(){
+
+  document
+    .getElementById(
+      "walletState"
+    )
+    .textContent =
+    "Checking...";
+
+
+  document
+    .getElementById(
+      "availableBalance"
+    )
+    .textContent =
+    "Loading...";
